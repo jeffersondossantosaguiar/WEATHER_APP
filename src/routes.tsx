@@ -6,6 +6,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 const { Navigator, Screen } = createStackNavigator()
 
 import WeatherCitySearch from "./pages/WeatherCitySearch"
+import WeatherCityDetails from './pages/WeatherCityDetails'
 
 export default function Routes() {
   return (
@@ -13,10 +14,10 @@ export default function Routes() {
       <Navigator
         screenOptions={{
           headerShown: false,
-          cardStyle: { backgroundColor: "#f2f3f5" }
         }}
       >
         <Screen name="WeatherCitySearch" component={WeatherCitySearch} />
+        <Screen name="WeatherCityDetails" component={WeatherCityDetails} />
       </Navigator>
     </NavigationContainer>
   )

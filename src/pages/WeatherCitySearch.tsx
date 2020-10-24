@@ -10,31 +10,58 @@ import {
   Dimensions
 } from "react-native"
 
+import { useNavigation } from "@react-navigation/native"
 import axios from "axios"
 
-const windowHeight = Dimensions.get('window').height;
+const windowHeight = Dimensions.get("window").height
 
-const Item = ({ city,  administrativeArea, country}) => (
-  <View style={styles.item}>
-    <Text style={styles.city} onPress={() => console.log({city, administrativeArea})}>{city}, {administrativeArea} - {country}</Text>
-  </View>
-)
+interface City {
+  AdministrativeArea: {
+    ID: string,
+  },
+  Country: {
+    ID: string,
+  }
+  Key: string,
+  LocalizedName: string,
+}
 
 export default function WeatherCitySearch() {
 
-  const [cityArray, setCityArray] = useState(null);
+  const [cityArray, setCityArray] = useState<City[]>([])
+  const navigation = useNavigation()
+
+  function handleNavigateToCityDetails(cityKey: number) {
+    navigation.navigate("WeatherCityDetails", { cityKey })
+  }
+
+  const Item = ({ city, administrativeArea, country, cityKey }) => (
+    <View style={styles.item}>
+      <Text
+        style={styles.city}
+        onPress={() => handleNavigateToCityDetails(cityKey)}
+      >
+        {city}, {administrativeArea} - {country}
+      </Text>
+    </View>
+  )
+
   const renderItem = ({ item }) => (
-    <Item city={item.LocalizedName} administrativeArea={item.AdministrativeArea.ID} country={item.Country.ID} />
-  );
-  
-  function fetchCity(e) {
+    <Item
+      city={item.LocalizedName}
+      administrativeArea={item.AdministrativeArea.ID}
+      country={item.Country.ID}
+      cityKey={item.Key}
+    />
+  )
+
+  function fetchCity(event: string) {
     axios
       .get(
-        `http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey=mWTxlMXwduK0k1GW5G20lzLbuZmRobic&q=${e}&language=pt-BR`
+        `http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey=mWTxlMXwduK0k1GW5G20lzLbuZmRobic&q=${event}&language=pt-BR`
       )
       .then(function (response) {
         setCityArray(response.data)
-        console.log(cityArray)
       })
       .catch(function (error) {
         console.log(error)
@@ -42,28 +69,31 @@ export default function WeatherCitySearch() {
   }
   return (
     <View style={styles.container}>
-      <ImageBackground source={require('../../assets/bkg.jpg')} style={styles.imageBackground}>
+      <ImageBackground
+        source={require("../../assets/bkg.jpg")}
+        style={styles.imageBackground}
+      >
         <TextInput
           placeholder="Buscar Cidade"
           placeholderTextColor="#FFF"
-          onChangeText={(e) => fetchCity(e)}
+          onChangeText={(event) => fetchCity(event)}
           style={styles.textInputSearchCity}
         />
         <FlatList
-        data={cityArray}
-        renderItem={renderItem}
-        keyExtractor={item => item.Key}
-        style={styles.itemsList}
+          data={cityArray}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.Key}
+          style={styles.itemsList}
         />
         <StatusBar style="auto" />
       </ImageBackground>
     </View>
-  ) 
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   textInputSearchCity: {
     color: "#FFF",
@@ -78,21 +108,21 @@ const styles = StyleSheet.create({
   },
   imageBackground: {
     flex: 1,
-    alignItems: "center",
+    alignItems: "center"
   },
   item: {
     height: 50,
-    width: 'auto',
+    width: "auto",
     backgroundColor: "rgba(4, 4, 4, 0.24)",
     borderRadius: 14,
     padding: 20,
     marginVertical: 1,
-    justifyContent: 'center'
+    justifyContent: "center"
   },
   city: {
     fontSize: 18,
     fontFamily: "Roboto_500Medium",
-    color: '#fff'
+    color: "#fff"
   },
   itemsList: {
     top: 80,
